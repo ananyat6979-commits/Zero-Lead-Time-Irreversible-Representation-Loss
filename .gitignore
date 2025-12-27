@@ -6,4 +6,10 @@ data/*
 !data/README.md
 results/*
 !results/README.md
+# Python virtual environments
+.venv/
+venv/
+Lib/
+Scripts/
+pyvenv.cfg
 
