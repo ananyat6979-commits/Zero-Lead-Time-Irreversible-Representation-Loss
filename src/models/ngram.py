@@ -11,7 +11,6 @@ Transparency > performance.
 
 from collections import Counter
 import math
-import random
 
 
 def tokenize(text):
@@ -33,11 +32,10 @@ class UnigramLM:
         vocab_size = len(self.counts)
         return (self.counts.get(tok, 0) + 1) / (self.total + vocab_size)
 
-    def sample(self, n=20):
+    def sample(self, sample_size, rng):
         tokens = list(self.counts.keys())
         probs = [self.prob(t) for t in tokens]
-        # NOTE: random seed will be externally controlled in experiments
-        return random.choices(tokens, probs, k=n)
+        return rng.choices(tokens, probs, k=sample_size)
 
     def cross_entropy(self, tokens):
         entropy = 0.0
@@ -73,16 +71,16 @@ class BigramLM:
             self.context_totals.get(ctx, 0) + len(self.vocab)
         )
 
-    def sample(self, start_token, n=20):
+    def sample(self, start_token, sample_size, rng):
         tokens = [start_token]
 
-        for _ in range(n - 1):
+        for _ in range(sample_size - 1):
             ctx = tokens[-1]
             # Sampling considers full vocabulary.
             # This increases entropy artificially but preserves support visibility.
             candidates = list(self.vocab)
             probs = [self.prob(ctx, t) for t in candidates]
-            tokens.append(random.choices(candidates, probs)[0])
+            tokens.append(rng.choices(candidates, probs)[0])
 
         return tokens
 
@@ -130,19 +128,19 @@ class TrigramLM:
             self.context_totals.get(ctx, 0) + len(self.vocab)
         )
 
-    def sample(self, start_tokens, n=20):
+    def sample(self, start_tokens, sample_size, rng):
         """
         start_tokens must be a tuple of two tokens
         """
         tokens = list(start_tokens)
 
-        for _ in range(n - 2):
+        for _ in range(sample_size - 2):
             ctx = (tokens[-2], tokens[-1])
             # Sampling considers full vocabulary.
             # This increases entropy artificially but preserves support visibility.
             candidates = list(self.vocab)
             probs = [self.prob(ctx, t) for t in candidates]
-            tokens.append(random.choices(candidates, probs)[0])
+            tokens.append(rng.choices(candidates, probs)[0])
 
         return tokens
 
