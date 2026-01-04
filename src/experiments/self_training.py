@@ -42,7 +42,9 @@ def run_self_training(
             synthetic_tokens=synthetic,
             alpha=config.alpha,
         )
-
+# Overwrite semantics are intentional:
+# each iteration replaces the dataset rather than accumulating tokens.
+# This prevents uncontrolled growth and isolates data-feedback effects.
         current_tokens = mixed
         datasets.append(current_tokens)
 
