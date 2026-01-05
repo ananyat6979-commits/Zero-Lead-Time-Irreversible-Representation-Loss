@@ -1,29 +1,26 @@
+# PHASE 3.5 — IRREVERSIBILITY TEST
+# Recovery under identical compute conditions.
+
 from src.experiments.model_factory import build_model
-from src.experiments.generation import generate_tokens
-from src.experiments.mixture import mix_tokens
 
 
 def run_recovery(clean_tokens, contaminated_tokens, config):
     """
-    Recovery training after contamination.
+    Retrain model on clean data after contamination.
 
-    Uses the same compute budget and data size as forward training.
+    Conditions:
+    - Same model family
+    - Same training procedure
+    - No synthetic data
+    - No mixing
     """
 
-    model = build_model(config.model_type)
-    model.train(contaminated_tokens)
+    # Model after contamination (for comparison only)
+    contaminated_model = build_model(config.model_type)
+    contaminated_model.train(contaminated_tokens)
 
-    synthetic = generate_tokens(
-        model=model,
-        seed_tokens=None,
-        sample_size=config.sample_size,
-        rng=None,  # RNG is irrelevant here; recovery is evaluated statistically later
-    )
+    # Fresh model retrained on clean data
+    recovered_model = build_model(config.model_type)
+    recovered_model.train(clean_tokens)
 
-    recovered = mix_tokens(
-        original_tokens=clean_tokens,
-        synthetic_tokens=synthetic,
-        alpha=config.alpha,
-    )
-
-    return list(recovered)
+    return contaminated_model, recovered_model
