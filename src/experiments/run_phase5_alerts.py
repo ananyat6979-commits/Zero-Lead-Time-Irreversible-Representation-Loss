@@ -12,7 +12,7 @@ This answers: when should we intervene?
 import json
 from pathlib import Path
 
-from src.diagnostics.thresholds import compute_js_thresholds
+from src.diagnostics.thresholds import classify_risk
 
 
 # ------------------
