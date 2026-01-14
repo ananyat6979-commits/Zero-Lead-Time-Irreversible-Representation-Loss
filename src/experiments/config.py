@@ -12,3 +12,6 @@ class ExperimentConfig:
     iterations: int          # number of self-training steps
     sample_size: int         # tokens generated per iteration
     random_seed: int         # reproducibility
+
+
+

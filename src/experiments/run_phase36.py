@@ -1,7 +1,8 @@
 # PHASE 3.6 — IRREVERSIBILITY UNDER EXPLICIT BOTTLENECK
 
+import random
 from pathlib import Path
-from src.data.bottlenecks import freeze_vocabulary, apply_vocab_bottleneck
+
 from src.experiments.self_training import run_self_training
 from src.experiments.recovery import run_recovery
 from src.metrics.distribution import (
@@ -31,24 +32,35 @@ def main():
     token_path = Path("data/processed/pride_and_prejudice.tokens.txt")
     original_tokens = load_tokens(token_path)
 
-    # ---- APPLY BOTTLENECK ----
-    vocab = freeze_vocabulary(original_tokens, max_vocab_size=None)
-    original_b = apply_vocab_bottleneck(original_tokens, vocab)
+    original_b = original_tokens
 
     # ---- PHASE 3 UNDER BOTTLENECK ----
-    datasets = run_self_training(original_b, config)
+    model_config = {"min_token_count": 3}
+
+    datasets = run_self_training(original_b,
+    config,
+    model_config=model_config
+    )
     contaminated = datasets[-1]
 
     # ---- PHASE 3.5 RECOVERY UNDER BOTTLENECK ----
+    model_config = {"min_token_count": 3}
+    
     contaminated_model, recovered_model = run_recovery(
-        original_b, contaminated, config
+    original_b,
+    contaminated,
+    config,
+    model_config=model_config,
     )
 
     # ---- DISTRIBUTIONAL COMPARISON ----
     original_dist = empirical_distribution(original_b)
     contaminated_dist = empirical_distribution(contaminated)
 
-    recovered_tokens = apply_vocab_bottleneck(original_tokens, vocab)
+    recovered_tokens = recovered_model.sample(
+        sample_size=len(original_tokens),
+        rng=random.Random(config.random_seed),
+    )
     recovered_dist = empirical_distribution(recovered_tokens)
 
     results = {

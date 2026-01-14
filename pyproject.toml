@@ -1,0 +1,9 @@
+[tool.project]
+name = "model-collapse-diagnostics"
+version = "0.1.0"
+
+[tool.black]
+line-length = 88
+
+[tool.isort]
+profile = "black"

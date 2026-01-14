@@ -1,4 +1,3 @@
-import numpy as np
 import json
 from pathlib import Path
 
@@ -14,15 +13,15 @@ def load_thresholds():
     return json.loads(THRESHOLD_PATH.read_text())
 
 
-def classify_risk(metric_name: str, value: float):
+def classify_risk(metric_name: str, delta_value: float):
     thresholds = load_thresholds().get(metric_name)
 
     if thresholds is None:
-        raise ValueError(f"No thresholds for metric '{metric_name}'")
+        raise ValueError(f"No thresholds defined for '{metric_name}'")
 
-    if value < thresholds["warning"]:
+    if delta_value < thresholds["warning"]:
         return "SAFE"
-    elif value < thresholds["high_risk"]:
+    elif delta_value < thresholds["high_risk"]:
         return "WARNING"
     else:
         return "HIGH_RISK"

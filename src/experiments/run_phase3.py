@@ -3,14 +3,11 @@
 # Produces D0 -> Dk datasets under controlled contamination.
 
 from pathlib import Path
-
 from src.experiments.config import ExperimentConfig
 from src.experiments.self_training import run_self_training
 
 
 def load_tokens(path: Path):
-    # Tokens are already materialized; decoding must be permissive.
-    # Encoding issues are NOT part of Phase 3 claims.
     return path.read_text(
         encoding="utf-8",
         errors="replace",
@@ -18,7 +15,6 @@ def load_tokens(path: Path):
 
 
 def save_dataset(tokens, path):
-    # Explicit UTF-8 to avoid Windows default encoding issues
     path.write_text(
         "\n".join(tokens),
         encoding="utf-8",
@@ -48,6 +44,7 @@ def main():
 
     # ---- SAVE OUTPUTS ----
     out_dir = Path("data/generated/phase3")
+    out_dir.mkdir(parents=True, exist_ok=True)
 
     for i, tokens in enumerate(datasets):
         save_dataset(tokens, out_dir / f"D{i}.txt")

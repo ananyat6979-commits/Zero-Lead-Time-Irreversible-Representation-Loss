@@ -11,6 +11,7 @@ Transparency > performance.
 
 from collections import Counter
 import math
+from src.models.constraints import apply_frequency_cutoff
 
 
 def tokenize(text):
@@ -18,13 +19,27 @@ def tokenize(text):
 
 
 class UnigramLM:
-    def __init__(self):
+    def __init__(self, min_token_count=None):
         self.counts = Counter()
         self.total = 0
+        self.min_token_count = min_token_count
+
 
     def train(self, tokens):
         self.counts.update(tokens)
         self.total = sum(self.counts.values())
+
+        if self.min_token_count is not None:
+            self.counts = apply_frequency_cutoff(
+                self.counts,
+                self.min_token_count
+            )
+            self.total = sum(self.counts.values())
+
+            assert all(
+                count >= self.min_token_count
+                for count in self.counts.values()
+            )
 
     def prob(self, tok):
         # Unseen tokens are handled via add-one smoothing.
@@ -43,6 +58,7 @@ class UnigramLM:
             p = self.prob(tok)
             entropy -= math.log2(p)
         return entropy / len(tokens)
+    
 
 
 class BigramLM:

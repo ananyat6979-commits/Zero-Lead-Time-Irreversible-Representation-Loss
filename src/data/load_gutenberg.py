@@ -3,8 +3,6 @@
 # No normalization beyond minimal hygiene.
 
 from pathlib import Path
-print("RUNNING:", Path(__file__).resolve())
-from pathlib import Path
 
 
 GUTENBERG_HEADER = "*** START OF THE PROJECT GUTENBERG EBOOK"
@@ -53,8 +51,6 @@ def main():
     out_path.write_text("\n".join(tokens))
 
     print(f"Saved {len(tokens)} tokens to {out_path}")
-    print("Token count:", len(tokens))
-    print("First 20 tokens:", tokens[:20])
 
     # ---- LINEAGE RECORDING (PHASE 2.5 ONLY) ----
     from src.data.lineage import record_dataset

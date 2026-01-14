@@ -12,6 +12,7 @@ from src.experiments.mixture import mix_tokens
 def run_self_training(
     original_tokens,
     config,
+    model_config=None,
 ):
     """
     Runs a controlled self-training loop.
@@ -27,7 +28,10 @@ def run_self_training(
     datasets.append(current_tokens)
 
     for step in range(config.iterations):
-        model = build_model(config.model_type)
+        model = build_model(
+            config.model_type,
+            model_config=model_config, 
+)
         model.train(current_tokens)
 
         synthetic = generate_tokens(
