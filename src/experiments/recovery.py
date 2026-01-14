@@ -59,4 +59,4 @@ def run_recovery(original_tokens, contaminated_tokens, config, model_config=None
 
     return contaminated_model, recovered_model
 
-    return contaminated_model, recovered_model
+    
