@@ -1,63 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8" />
   <title>ZL-IRL Exhibit</title>
   <style>
     body {
-      margin: 0;
-      padding: 0;
-      background: #0e1117;
+      background: #0b0f14;
       color: #e6edf3;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .container {
-      max-width: 1100px;
       text-align: center;
+      margin: 0;
+      padding: 40px;
     }
     img {
-      max-width: 100%;
+      max-width: 95%;
+      height: auto;
+      margin-top: 30px;
       border-radius: 8px;
     }
     .caption {
       margin-top: 16px;
-      font-size: 1.05rem;
-      line-height: 1.4;
-      color: #c9d1d9;
+      font-size: 1.1rem;
+      opacity: 0.9;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <img id="exhibit" src="../figures/zl_irl_exhibit.png" alt="ZL-IRL regime transition">
 
-<button onclick="toggleThreshold()" style="
-  margin-top: 12px;
-  background: #21262d;
-  color: #e6edf3;
-  border: 1px solid #30363d;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-">
-  Toggle SAFE threshold
-</button>
+<h1>Zero-Lead-Time Irreversible Representation Loss (ZL-IRL)</h1>
 
-<script>
-let visible = true;
-function toggleThreshold() {
-  visible = !visible;
-  document.getElementById("exhibit").style.opacity = visible ? "1.0" : "0.9";
-}
-</script>
+<img src="../results/zl_irl_exhibit.png" alt="ZL-IRL regime transition">
 
-    <div class="caption">
-      When a deterministic representation constraint is introduced, the system crosses the safety boundary instantly, without any observable approach—making early warning impossible.
-    </div>
-  </div>
+<div class="caption">
+Failure enters the system at the moment the representation constraint is applied; no prior signal exists.
+</div>
+
 </body>
 </html>
