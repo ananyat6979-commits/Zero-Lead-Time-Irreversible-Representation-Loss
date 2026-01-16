@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ZL-IRL Exhibit</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #0e1117;
+      color: #e6edf3;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      max-width: 1100px;
+      text-align: center;
+    }
+    img {
+      max-width: 100%;
+      border-radius: 8px;
+    }
+    .caption {
+      margin-top: 16px;
+      font-size: 1.05rem;
+      line-height: 1.4;
+      color: #c9d1d9;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img id="exhibit" src="../figures/zl_irl_exhibit.png" alt="ZL-IRL regime transition">
+
+<button onclick="toggleThreshold()" style="
+  margin-top: 12px;
+  background: #21262d;
+  color: #e6edf3;
+  border: 1px solid #30363d;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+">
+  Toggle SAFE threshold
+</button>
+
+<script>
+let visible = true;
+function toggleThreshold() {
+  visible = !visible;
+  document.getElementById("exhibit").style.opacity = visible ? "1.0" : "0.9";
+}
+</script>
+
+    <div class="caption">
+      When a deterministic representation constraint is introduced, the system crosses the safety boundary instantly, without any observable approach—making early warning impossible.
+    </div>
+  </div>
+</body>
+</html>
