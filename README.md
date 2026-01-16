@@ -1,3 +1,7 @@
+Irreversibility in language model behavior is not a property of self-training alone — it emerges only when explicit representation constraints introduce path-dependent information loss.
+
+Self-training alone does not induce irreversible degradation in memoryless language models. Irreversibility emerges only when explicit representation constraints introduce path-dependent information loss, causing recovery retraining to further degrade distributional support.
+
 Early Warning Diagnostics for Distributional Degradation in Self-Training ML Pipelines
 Abstract
 
@@ -416,3 +420,12 @@ While multiple distributional diagnostics detect deviation at similar times, tai
 
 
 In this regime, the diagnostic transitions directly from SAFE to HIGH_RISK, indicating extremely low tolerance for deviation from the reference distribution. The absence of a prolonged WARNING phase reflects the stability of the clean distribution, not a limitation of the diagnostic.
+
+From Phase 3.6:
+In memoryless unigram models, self-training degradation is reversible under clean retraining. However, introducing a fixed representation constraint induces path-dependent irreversibility, evidenced by increased divergence and persistent loss of tail mass after recovery.
+
+In a memoryless language model, self-training degradation is reversible unless the system introduces an explicit representation constraint. When such a constraint exists, the system becomes path-dependent and exhibits irreversible loss of distributional support.
+
+In simpler language:
+
+The system forgets not because it trains on itself — but because it is prevented from remembering what it once knew.

@@ -1,5 +1,4 @@
-from src.models.ngram import UnigramLM, BigramLM, TrigramLM
-
+from src.models.ngram import UnigramLM
 
 def build_model(model_type, model_config=None):
     model_config = model_config or {}
@@ -8,9 +7,5 @@ def build_model(model_type, model_config=None):
         return UnigramLM(
             min_token_count=model_config.get("min_token_count")
         )
-    if model_type == "bigram":
-        return BigramLM()
-    if model_type == "trigram":
-        return TrigramLM()
 
     raise ValueError(f"Unknown model type: {model_type}")

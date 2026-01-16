@@ -27,30 +27,33 @@ class UnigramLM:
 
     def train(self, tokens):
         self.counts.update(tokens)
-        self.total = sum(self.counts.values())
 
         if self.min_token_count is not None:
             self.counts = apply_frequency_cutoff(
                 self.counts,
                 self.min_token_count
             )
-            self.total = sum(self.counts.values())
 
+        self.total = sum(self.counts.values())
+    
+        if self.min_token_count is not None:
             assert all(
                 count >= self.min_token_count
                 for count in self.counts.values()
-            )
+    )
 
+
+    
     def prob(self, tok):
-        # Unseen tokens are handled via add-one smoothing.
-        # Vocabulary is derived from training tokens only.
         vocab_size = len(self.counts)
         return (self.counts.get(tok, 0) + 1) / (self.total + vocab_size)
+
 
     def sample(self, sample_size, rng):
         tokens = list(self.counts.keys())
         probs = [self.prob(t) for t in tokens]
         return rng.choices(tokens, probs, k=sample_size)
+    
 
     def cross_entropy(self, tokens):
         entropy = 0.0
