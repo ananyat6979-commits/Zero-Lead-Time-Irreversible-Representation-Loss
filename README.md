@@ -1,8 +1,23 @@
+## When Collapse Is Entered, Not Approached
+
+![ZL-IRL Exhibit](figures/zl_irl_exhibit_with_threshold.png)
+
+*Some learning-system failures do not approach collapse.  
+They enter it.*
+
+
+Zero-Lead-Time Irreversible Representation Loss (ZL-IRL)
+
+Zero-Lead-Time Irreversible Representation Loss (ZL-IRL) occurs when a deterministic preprocessing or representational constraint removes task-relevant information such that downstream training cannot asymptotically recover original performance, and no monitoring signal can provide advance warning because the information required for detection is destroyed by the triggering transformation itself.
+
 Irreversibility in language model behavior is not a property of self-training alone — it emerges only when explicit representation constraints introduce path-dependent information loss.
 
 Self-training alone does not induce irreversible degradation in memoryless language models. Irreversibility emerges only when explicit representation constraints introduce path-dependent information loss, causing recovery retraining to further degrade distributional support.
 
-Early Warning Diagnostics for Distributional Degradation in Self-Training ML Pipelines
+When Early Warning Is Impossible: A Failure-Mode Boundary in Learning Systems
+
+There exists a class of learning-system failures where early warning is impossible because the act that causes failure also destroys the information needed to detect it.
+ML Pipelines
 Abstract
 
 Modern ML systems increasingly train on partially self-generated data.
