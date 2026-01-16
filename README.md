@@ -1,3 +1,10 @@
+## Zero-Lead-Time Irreversible Representation Loss (ZL-IRL)
+
+![ZL-IRL regime transition](figures/zl_irl_exhibit.png)
+
+**When a deterministic representation constraint is introduced, the system crosses the safety boundary instantly, without any observable approach—making early warning impossible.**
+
+
 ## When Collapse Is Entered, Not Approached
 
 ![ZL-IRL Exhibit](figures/zl_irl_exhibit_with_threshold.png)
@@ -5,14 +12,22 @@
 *Some learning-system failures do not approach collapse.  
 They enter it.*
 
+When a deterministic representation constraint is introduced, the system crosses the safety boundary instantly, without any observable approach—making early warning impossible.
 
 Zero-Lead-Time Irreversible Representation Loss (ZL-IRL)
 
 Zero-Lead-Time Irreversible Representation Loss (ZL-IRL) occurs when a deterministic preprocessing or representational constraint removes task-relevant information such that downstream training cannot asymptotically recover original performance, and no monitoring signal can provide advance warning because the information required for detection is destroyed by the triggering transformation itself.
 
+Beyond a contamination threshold, retraining from clean data fails to restore lost distributional support, even when standard performance metrics remain stable.
+
+This is irreversible representation loss.
+
 Irreversibility in language model behavior is not a property of self-training alone — it emerges only when explicit representation constraints introduce path-dependent information loss.
 
 Self-training alone does not induce irreversible degradation in memoryless language models. Irreversibility emerges only when explicit representation constraints introduce path-dependent information loss, causing recovery retraining to further degrade distributional support.
+
+## Non-Claims
+This work does not propose early warning systems, monitoring solutions, or mitigation strategies.
 
 When Early Warning Is Impossible: A Failure-Mode Boundary in Learning Systems
 
