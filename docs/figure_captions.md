@@ -1,0 +1,1 @@
+Figure 1. After self-training under a deterministic representation constraint, retraining on clean data converges to a higher-divergence fixed point, demonstrating irreversible representational loss.
