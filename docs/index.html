@@ -1,39 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8">
   <title>ZL-IRL Exhibit</title>
   <style>
     body {
-      background: #0b0f14;
+      margin: 0;
+      padding: 0;
+      background: #0e1117;
       color: #e6edf3;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      max-width: 1100px;
       text-align: center;
-      margin: 0;
-      padding: 40px;
     }
     img {
-      max-width: 95%;
-      height: auto;
-      margin-top: 30px;
+      max-width: 100%;
       border-radius: 8px;
     }
     .caption {
       margin-top: 16px;
-      font-size: 1.1rem;
-      opacity: 0.9;
+      font-size: 1.05rem;
+      line-height: 1.4;
+      color: #c9d1d9;
     }
   </style>
 </head>
 <body>
-
-<h1>Zero-Lead-Time Irreversible Representation Loss (ZL-IRL)</h1>
-
-<img src="../results/zl_irl_exhibit.png" alt="ZL-IRL regime transition">
-
-<div class="caption">
-Failure enters the system at the moment the representation constraint is applied; no prior signal exists.
-</div>
-
+  <div class="container">
+    <img src="../figures/zl_irl_exhibit.png" alt="ZL-IRL regime transition">
+    <div class="caption">
+      When a deterministic representation constraint is introduced, the system crosses the safety boundary instantly, without any observable approach—making early warning impossible.
+    </div>
+  </div>
 </body>
 </html>
