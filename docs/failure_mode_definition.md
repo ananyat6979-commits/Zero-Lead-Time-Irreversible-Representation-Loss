@@ -1,14 +1,14 @@
 # Zero-Lead-Time Irreversible Representation Loss (ZL-IRL)
 
 ## Trigger
-A deterministic representation constraint applied before or during self-training that removes low-frequency but informative structure.
+A deterministic representation constraint applied before or during self-training that irreversibly truncates representational support.
 
 ## Observable Signature
-- Immediate regime shift in distributional metrics
-- No detectable precursor signal
-- Flat negative controls
+- Immediate divergence from the original data distribution
+- No statistically detectable precursor under standard distributional metrics
+- Negative controls remain flat under identical conditions
 
 ## Consequence
 - Recovery converges to a degraded attractor
-- Clean data does not restore the original representation
-- Monitoring cannot intervene after regime entry
+- Retraining on clean data fails to restore representational support
+- Monitoring-based intervention is ineffective after regime entry

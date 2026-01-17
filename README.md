@@ -459,3 +459,5 @@ In a memoryless language model, self-training degradation is reversible unless t
 In simpler language:
 
 The system forgets not because it trains on itself — but because it is prevented from remembering what it once knew.
+
+An empirical boundary proof showing that deterministic representation truncation induces zero-lead-time irreversible failure in self-training systems, making post-entry monitoring ineffective.
