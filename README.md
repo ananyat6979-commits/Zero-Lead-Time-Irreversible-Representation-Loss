@@ -24,11 +24,11 @@ This is irreversible representation loss.
 ## What This Project Actually Studies
 
 Modern ML systems increasingly train on partially self-generated data.  
-While catastrophic failure (“model collapse”) is often discussed, far less is understood about **silent distributional degradation**; shifts in data geometry that occur while surface behavior still appears acceptable.
+While catastrophic failure (“model collapse”) is often discussed, far less is understood about **silent distributional degradation**, shifts in data geometry that occur while surface behavior still appears acceptable.
 
 This project asks a narrow, operationally critical question:
 
-> **Can distributional diagnostics detect harmful self-training dynamics early: before surface metrics degrade, and before recovery becomes difficult or impossible?**
+> **Can distributional diagnostics detect harmful self-training dynamics early, before surface metrics degrade and before recovery becomes difficult or impossible?**
 
 Crucially, we do **not** assume:
 
@@ -111,7 +111,7 @@ This project reframes the problem from:
 
 to:
 
-> **“When does a self-training system enter a risky regime; and is intervention still possible?”**
+> **“When does a self-training system enter a risky regime, and is intervention still possible?”**
 
 The answer is conditional.
 
@@ -135,10 +135,10 @@ The failure is not of monitoring, but of recoverability.
 
 ## Repository Structure
 
-- `README.md` : final boundary result (this document)
-- `experiments/README.md` : full experimental provenance
-- `src/` : deterministic experimental code
-- `figures/` : minimal, non-misleading visualizations
+- `README.md`: final boundary result (this document)
+- `experiments/README.md`: full experimental provenance
+- `src/`: deterministic experimental code
+- `figures/`: minimal, non-misleading visualizations
 
 ---
 
@@ -154,5 +154,5 @@ Irreversibility is conditional and rare.
 
 **When it occurs via deterministic representation truncation, it exhibits zero lead time.**
 
-> The system forgets not because it trains on itself, 
+> The system forgets not because it trains on itself,  
 > but because it is prevented from remembering what it once knew.

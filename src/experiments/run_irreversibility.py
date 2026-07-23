@@ -5,7 +5,7 @@
 # No metrics. No plots. Dataset generation only.
 
 from src.experiments.self_training import run_self_training
-from src.experiments.recovery import run_recovery
+from src.experiments.experimental_recovery import run_recovery
 from src.experiments.config import ExperimentConfig
 
 
