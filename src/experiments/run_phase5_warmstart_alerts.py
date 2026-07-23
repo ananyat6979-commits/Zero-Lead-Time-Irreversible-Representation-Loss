@@ -20,8 +20,6 @@ from src.experiments.mixture import mix_tokens
 from src.experiments.config import ExperimentConfig
 import random
 
-config = ExperimentConfig()
-rng = random.Random(config.random_seed)
 
 from src.metrics.distribution import (
     empirical_distribution,
@@ -42,6 +40,7 @@ MODEL_TYPE = "unigram"
 ALPHA = 0.1                 # fixed contamination
 SAMPLE_SIZE = 20
 MAX_ITER = 15
+RANDOM_SEED = 42
 
 TOKEN_PATH = Path("data/processed/pride_and_prejudice.tokens.txt")
 OUT_PATH = Path("results/phase5_warmstart_alerts.json")
@@ -70,6 +69,7 @@ def compute_metrics(tokens, reference_dist):
 # ---------------------------------------------------------------------
 
 def main():
+    rng = random.Random(RANDOM_SEED)
     original_tokens = load_tokens(TOKEN_PATH)
     reference_dist = empirical_distribution(original_tokens)
 
