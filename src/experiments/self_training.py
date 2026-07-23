@@ -7,6 +7,9 @@ from src.experiments.mixture import mix_tokens
 def run_self_training(original_tokens, config, model_config=None):
     rng = random.Random(config.random_seed)
 
+    n_original = int(config.alpha * len(original_tokens))
+    n_synthetic = len(original_tokens) - n_original
+
     datasets = []
     current_tokens = list(original_tokens)
     datasets.append(current_tokens)
@@ -21,7 +24,7 @@ def run_self_training(original_tokens, config, model_config=None):
         synthetic = generate_tokens(
             model=model,
             seed_tokens=None,
-            sample_size=config.sample_size,
+            sample_size=n_synthetic,
             rng=rng,
         )
 

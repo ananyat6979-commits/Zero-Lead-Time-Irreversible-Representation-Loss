@@ -12,6 +12,15 @@ def mix_tokens(original_tokens, synthetic_tokens, alpha):
     n_original = int(alpha * len(original_tokens))
     n_synthetic = len(original_tokens) - n_original
 
+    if len(synthetic_tokens) < n_synthetic:
+        raise ValueError(
+            f"mix_tokens requires {n_synthetic} synthetic tokens to honor "
+            f"alpha={alpha} against a {len(original_tokens)}-token corpus, "
+            f"but only {len(synthetic_tokens)} were provided. Silently "
+            f"truncating would corrupt the alpha-mixture and understate "
+            f"contamination -- see docs/phase_3_mixture_fix.md."
+        )
+
     return (
         original_tokens[:n_original] +
         synthetic_tokens[:n_synthetic]
