@@ -77,6 +77,8 @@ def main():
     model = build_model(MODEL_TYPE)
     model.train(original_tokens)
 
+    base_tail_mass = zipf_tail_mass(original_tokens)
+
     results = []
 
     for t in range(MAX_ITER + 1):
@@ -100,7 +102,8 @@ def main():
         # ---- Diagnostics BEFORE updating state ----
         metrics = compute_metrics(synthetic, reference_dist)
 
-        risk = classify_risk("tail_mass", metrics["tail_mass"])
+        tail_delta = metrics["tail_mass"] - base_tail_mass
+        risk = classify_risk("tail_mass_delta", tail_delta)
 
         record = {
             "iteration": t,
