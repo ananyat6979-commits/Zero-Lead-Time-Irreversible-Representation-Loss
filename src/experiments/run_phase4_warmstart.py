@@ -37,7 +37,7 @@ from src.metrics.distribution import (
 # ------------------
 
 ALPHAS = [0.1, 0.2, 0.3, 0.4, 0.5]
-SAMPLE_SIZE = 1000   # evaluation only
+SAMPLE_SIZE = 1000   # evaluation only (tail_mass/ttr; js_to_original/entropy now use the model's full distribution directly)
 RANDOM_SEED = 42
 
 TOKEN_PATH = Path("data/processed/pride_and_prejudice.tokens.txt")
@@ -48,13 +48,21 @@ def load_tokens(path: Path):
     return path.read_text(encoding="utf-8", errors="replace").splitlines()
 
 
-def evaluate(sampled_tokens, reference_tokens):
-    p = empirical_distribution(sampled_tokens)
-    q = empirical_distribution(reference_tokens)
+def model_distribution(model):
+    """
+    Returns the model's actual learned (Laplace-smoothed) distribution,
+    with no sampling step -- avoids the small-sample JS-divergence
+    noise floor that a stochastic sample vs. full-corpus comparison has.
+    """
+    return {tok: model.prob(tok) for tok in model.counts}
+
+
+def evaluate(model, sampled_tokens, reference_dist):
+    dist = model_distribution(model)
 
     return {
-        "entropy": shannon_entropy(p),
-        "js_to_original": js_divergence(p, q),
+        "entropy": shannon_entropy(dist),
+        "js_to_original": js_divergence(dist, reference_dist),
         "tail_mass": zipf_tail_mass(sampled_tokens),
         "ttr": type_token_ratio(sampled_tokens),
     }
@@ -63,6 +71,7 @@ def evaluate(sampled_tokens, reference_tokens):
 def main():
     rng = random.Random(RANDOM_SEED)
     original_tokens = load_tokens(TOKEN_PATH)
+    original_dist = empirical_distribution(original_tokens)
 
     results = []
 
@@ -71,10 +80,12 @@ def main():
         base_model = build_model("unigram")
         base_model.train(original_tokens)
 
+        n_original = int(alpha * len(original_tokens))
+        n_synthetic = len(original_tokens) - n_original
         synthetic = generate_tokens(
             model=base_model,
             seed_tokens=None,
-            sample_size=SAMPLE_SIZE,
+            sample_size=n_synthetic,
             rng=rng,
         )
 
@@ -109,8 +120,8 @@ def main():
 
         metrics = {
             "alpha": alpha,
-            "contaminated": evaluate(contaminated_sample, original_tokens),
-            "recovered": evaluate(recovered_sample, original_tokens),
+            "contaminated": evaluate(contaminated_model, contaminated_sample, original_dist),
+            "recovered": evaluate(recovered_model, recovered_sample, original_dist),
         }
 
         results.append(metrics)
