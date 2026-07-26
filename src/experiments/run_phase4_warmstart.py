@@ -1,5 +1,5 @@
 """
-PHASE 4 — STATE PERSISTENCE (WARM-START) IRREVERSIBILITY TEST
+PHASE 4: STATE PERSISTENCE (WARM-START) IRREVERSIBILITY TEST
 
 Question:
 Does recovery fail when training history is preserved?
@@ -11,6 +11,22 @@ No architecture changes.
 No data changes.
 No induced bottlenecks.
 """
+# NOTE (flagged, not fixed): verified directly this session that
+# run_warmstart_recovery does not reset the model. It calls train on the
+# already trained contaminated_model, so counts accumulate additively.
+# Confirmed with a direct test: contaminated_model.total before recovery
+# was 127359, recovered_model.total after recovery was 254718, exactly
+# double, matching len(contaminated_tokens) + len(original_tokens) exactly.
+# Also confirmed with a separate test: training a clean model twice on the
+# same data, zero contamination anywhere, produces lower divergence
+# (js around 0.00222) than training once (js around 0.00723), purely from
+# Laplace smoothing's plus one correction mattering less at higher total
+# counts. This means part of the gap between contaminated and recovered
+# js_to_original values in this script's output reflects total token count
+# difference, not only genuine recovery from contamination. Not resolved
+# here, needs a design decision on whether the pristine floor comparison
+# should also be trained twice to control for this.
+
 
 import json
 import random
