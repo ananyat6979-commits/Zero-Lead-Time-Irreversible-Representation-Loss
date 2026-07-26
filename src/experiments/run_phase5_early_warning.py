@@ -1,19 +1,22 @@
 import json
 from pathlib import Path
 
-# NOTE (flagged, not fixed): this script writes results/phase5_thresholds.json
-# using a DIFFERENT method and schema than run_phase5_calibrate_thresholds.py:
-# this one derives {"thresholds": {"safe": ..., "high_risk": ...}} from
-# max(phase3.5's raw js_divergence) * [1, 2], while
+# NOTE (collision fixed, method choice still open): this script previously
+# wrote to results/phase5_thresholds.json, the same path used by
+# run_phase5_calibrate_thresholds.py, with an incompatible schema. This
+# derives {"thresholds": {"safe": ..., "high_risk": ...}} from
+# max(phase3.5's raw js_divergence) * 2, while
 # run_phase5_calibrate_thresholds.py derives {"tail_mass_delta": {"warning":
-# ..., "high_risk": ...}} via bootstrap resampling. These are NOT
+# ..., "high_risk": ...}} via bootstrap resampling. These are still NOT
 # interchangeable, run_phase5_warmstart_alerts.py and
-# run_phase6_iteration_boundary.py both require the tail_mass_delta schema.
-# Running this script after run_phase5_calibrate_thresholds.py will silently
-# overwrite results/phase5_thresholds.json back into the incompatible,
-# stale schema and break both of those scripts again. DO NOT RUN this
-# script until this conflict is resolved, committed here only to get
-# it under version control; not executed this session.
+# run_phase6_iteration_boundary.py both require the tail_mass_delta schema
+# from run_phase5_calibrate_thresholds.py, not this script's output.
+# The output path is now renamed to results/phase5_thresholds_js_based.json
+# so the two scripts can no longer silently overwrite each other's file.
+# Which calibration method should actually be canonical is still an open
+# design decision, not resolved here. Still not run this session, since
+# results/phase5_alerts.json's schema also needs reconciling with
+# plot_phase5_alerts.py before this is fully safe to exercise end to end.
 
 def load(path: Path):
     with path.open() as f:
@@ -65,7 +68,7 @@ def main():
         })
 
     Path("results").mkdir(exist_ok=True)
-    with open("results/phase5_thresholds.json", "w") as f:
+    with open("results/phase5_thresholds_js_based.json", "w") as f:
         json.dump(thresholds, f, indent=2)
     with open("results/phase5_alerts.json", "w") as f:
         json.dump(alerts, f, indent=2)
