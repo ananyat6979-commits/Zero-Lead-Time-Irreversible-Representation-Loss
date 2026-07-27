@@ -32,7 +32,7 @@ def main():
     ax2.plot(recovery_iters, js_minus_control, color="#60A5FA", marker="o")
     ax2.set_xscale("log")
     ax2.set_xlabel("Recovery iterations (log scale)")
-    ax2.set_ylabel("js_recovered minus control")
+    ax2.set_ylabel("JS divergence (recovered - pristine control)")
     ax2.set_title("Recovery signal after removing training-count artifact")
 
     fig.suptitle(
