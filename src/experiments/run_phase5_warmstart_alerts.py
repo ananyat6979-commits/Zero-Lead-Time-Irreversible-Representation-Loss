@@ -83,10 +83,13 @@ def main():
 
     for t in range(MAX_ITER + 1):
         # ---- Generate from current model state ----
+        n_original = int(ALPHA * len(original_tokens))
+        n_synthetic = len(original_tokens) - n_original
+
         synthetic = generate_tokens(
             model=model,
             seed_tokens=None,
-            sample_size=SAMPLE_SIZE,
+            sample_size=n_synthetic,
             rng=rng,
         )
 
