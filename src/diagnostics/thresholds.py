@@ -19,9 +19,26 @@ def classify_risk(metric_name: str, delta_value: float):
     if thresholds is None:
         raise ValueError(f"No thresholds defined for '{metric_name}'")
 
-    if delta_value < thresholds["warning"]:
+    # Verified this session: the original directional comparison
+    # (delta_value < thresholds["warning"]) assumed "more negative is
+    # always safer," which is backwards for tail_mass_delta. A delta of
+    # exactly 0.0 read HIGH_RISK, and a delta of -0.01, a much larger
+    # collapse than either calibrated threshold, read SAFE. Confirmed
+    # directly against real thresholds this session.
+    #
+    # Fixed by classifying on distance from zero, sorting the two
+    # threshold magnitudes rather than assuming warning's magnitude is
+    # smaller than high_risk's. Verified this session that with real
+    # calibrated thresholds, abs(warning) is actually larger than
+    # abs(high_risk), so assuming an order without sorting would make
+    # the WARNING band unreachable.
+
+    magnitude = abs(delta_value)
+    lo, hi = sorted([abs(thresholds["warning"]), abs(thresholds["high_risk"])])
+
+    if magnitude <= lo:
         return "SAFE"
-    elif delta_value < thresholds["high_risk"]:
+    elif magnitude <= hi:
         return "WARNING"
     else:
         return "HIGH_RISK"
