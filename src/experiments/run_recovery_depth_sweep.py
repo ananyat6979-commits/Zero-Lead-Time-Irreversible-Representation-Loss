@@ -1,8 +1,8 @@
 import random
+import copy
 from pathlib import Path
 
-from src.experiments.recovery import run_recovery
-from src.experiments.config import ExperimentConfig
+from src.experiments.model_factory import build_model
 from src.metrics.distribution import (
     empirical_distribution,
     js_divergence,
@@ -19,43 +19,53 @@ def main():
     base_dir = Path("data/generated/phase3")
     original = load_tokens(base_dir / "D0.txt")
     contaminated = load_tokens(base_dir / "D10.txt")
-    
-    # NOTE (held, not fixed): config.iterations is
-    # never consumed anywhere inside run_recovery(), so this sweep is
-    # currently a no-op. Verified empirically: every recovery_iters value
-    # below produces bit-identical output (js_recovered=0.027955425229532538
-    # regardless of recovery_iters). Needs a design decision on what
-    # "recovery iterations" should actually mean before this is fixed,
-    # not fixed here.
+    original_dist = empirical_distribution(original)
+
+    contaminated_model = build_model("unigram")
+    contaminated_model.train(contaminated)
+
+    # NOTE: previously this sweep was a no-op, config.iterations was
+    # never consumed inside run_recovery(). Redesigned to genuinely vary
+    # with recovery_iters, real warm-start recovery, calling train()
+    # repeatedly on a deep copy of the contaminated model. A matched-count
+    # pristine control is trained the same number of times on clean data
+    # only, so the training-call-count artifact verified earlier this
+    # session, training twice lowers divergence purely from Laplace
+    # smoothing regardless of content, is present in both arms and
+    # js_recovered_minus_control isolates genuine recovery from that
+    # artifact.
     results = []
-
     for recovery_iters in [1, 2, 5, 10, 20, 50]:
-        config = ExperimentConfig(
-            model_type="unigram",
-            alpha=0.5,
-            iterations=recovery_iters,
-            sample_size=20,
-            random_seed=42,
-        )
+        recovered = copy.deepcopy(contaminated_model)
+        pristine_control = build_model("unigram")
 
-        _, recovered_model = run_recovery(
-            original,
-            contaminated,
-            config,
-            model_config=None,  # 🔓 NO constraint
-        )
+        for _ in range(recovery_iters):
+            recovered.train(original)
+            pristine_control.train(original)
 
-        recovered_tokens = recovered_model.sample(
+        recovered_tokens = recovered.sample(
             sample_size=len(original),
-            rng=random.Random(config.random_seed),
+            rng=random.Random(42),
+        )
+        pristine_tokens = pristine_control.sample(
+            sample_size=len(original),
+            rng=random.Random(42),
+        )
+
+        js_recovered = js_divergence(
+            original_dist,
+            empirical_distribution(recovered_tokens),
+        )
+        js_pristine_control = js_divergence(
+            original_dist,
+            empirical_distribution(pristine_tokens),
         )
 
         results.append({
             "recovery_iters": recovery_iters,
-            "js_recovered": js_divergence(
-                empirical_distribution(original),
-                empirical_distribution(recovered_tokens),
-            ),
+            "js_recovered": js_recovered,
+            "js_pristine_control": js_pristine_control,
+            "js_recovered_minus_control": js_recovered - js_pristine_control,
             "tail_mass_recovered": zipf_tail_mass(recovered_tokens),
         })
 
