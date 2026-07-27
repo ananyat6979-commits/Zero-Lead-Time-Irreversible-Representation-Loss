@@ -1,5 +1,5 @@
 """
-PHASE 5′ — EARLY-WARNING DIAGNOSTICS UNDER STATE PERSISTENCE
+PHASE 5′: EARLY-WARNING DIAGNOSTICS UNDER STATE PERSISTENCE
 
 This phase tests whether distributional diagnostics provide
 advance warning when degradation accumulates through training history.
