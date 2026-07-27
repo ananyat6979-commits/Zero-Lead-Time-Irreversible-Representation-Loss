@@ -67,7 +67,7 @@ def load_tokens(path: Path):
 def model_distribution(model):
     """
     Returns the model's actual learned (Laplace-smoothed) distribution,
-    with no sampling step -- avoids the small-sample JS-divergence
+    with no sampling stepm avoids the small-sample JS-divergence
     noise floor that a stochastic sample vs. full-corpus comparison has.
     """
     return {tok: model.prob(tok) for tok in model.counts}
@@ -120,6 +120,21 @@ def main():
             original_tokens,
         )
 
+        # ---- Matched-count pristine control ----
+        # Verified earlier this session: run_warmstart_recovery trains on
+        # top of the already-trained contaminated_model, so recovered_model
+        # has been trained twice (once via contamination, once via
+        # recovery), while a naive pristine floor trained only once would
+        # not be a fair comparison, per the same session's finding that
+        # training twice on clean data alone lowers divergence purely from
+        # Laplace smoothing, independent of any real recovery. This control
+        # is trained twice on original_tokens only, matching recovered_model's
+        # training call count, so the artifact is present in both and
+        # cancels out in the comparison.
+        pristine_control = build_model("unigram")
+        pristine_control.train(original_tokens)
+        pristine_control.train(original_tokens)
+
         contaminated_sample = generate_tokens(
             model=contaminated_model,
             seed_tokens=None,
@@ -134,10 +149,24 @@ def main():
             rng=rng,
         )
 
+        pristine_control_sample = generate_tokens(
+            model=pristine_control,
+            seed_tokens=None,
+            sample_size=SAMPLE_SIZE,
+            rng=rng,
+        )
+
+        recovered_eval = evaluate(recovered_model, recovered_sample, original_dist)
+        pristine_control_eval = evaluate(pristine_control, pristine_control_sample, original_dist)
+
         metrics = {
             "alpha": alpha,
             "contaminated": evaluate(contaminated_model, contaminated_sample, original_dist),
-            "recovered": evaluate(recovered_model, recovered_sample, original_dist),
+            "recovered": recovered_eval,
+            "pristine_control_matched_count": pristine_control_eval,
+            "recovered_js_minus_control": (
+                recovered_eval["js_to_original"] - pristine_control_eval["js_to_original"]
+            ),
         }
 
         results.append(metrics)
