@@ -1,5 +1,5 @@
 """
-PHASE 6A — ITERATION BOUNDARY
+PHASE 6A: ITERATION BOUNDARY
 
 Question:
 How long can a self-training pipeline run before entering a risk regime,
@@ -61,6 +61,22 @@ def main():
     current_tokens = list(original_tokens)
     base_tail_mass = zipf_tail_mass(original_tokens)
 
+    # Fixed: previously a fresh, untrained model was built every single
+    # iteration inside the loop, model = build_model(MODEL_TYPE), trained
+    # only on current_tokens, so there was no real warm-start persistence
+    # across iterations at all, despite the script's own docstring
+    # stating everything except iteration count is held constant.
+    # Verified this session: after correcting the calibration thresholds,
+    # this memoryless version produced noisy, repeatedly flipping
+    # SAFE/WARNING/HIGH_RISK classifications across iterations, unlike
+    # run_phase5_warmstart_alerts.py's genuine warm-start pattern, which
+    # showed a clean one-time transition. Fixed by building the model
+    # once, outside the loop, and continuing to train the same object
+    # each iteration, matching run_phase5_warmstart_alerts.py's actual
+    # warm-start mechanism.
+    model = build_model(MODEL_TYPE)
+    model.train(original_tokens)
+
     history = []
     tail_history = []
 
@@ -94,10 +110,7 @@ def main():
         if iteration == MAX_ITER:
             break
 
-        # ---- Self-training step ----
-        model = build_model(MODEL_TYPE)
-        model.train(current_tokens)
-
+        # ---- Self-training step (warm-start, model persists) ----
         n_original = int(ALPHA * len(original_tokens))
         n_synthetic = len(original_tokens) - n_original
         synthetic = generate_tokens(
@@ -112,6 +125,8 @@ def main():
             synthetic_tokens=synthetic,
             alpha=ALPHA,
         )
+
+        model.train(current_tokens)
 
     # ------------------
     # SAVE RESULTS
