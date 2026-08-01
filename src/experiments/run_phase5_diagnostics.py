@@ -1,5 +1,5 @@
 """
-PHASE 5 — EARLY WARNING DIAGNOSTICS
+PHASE 5: EARLY WARNING DIAGNOSTICS
 
 This phase validates whether distributional metrics provide
 early warning of self-training degradation *before* collapse
