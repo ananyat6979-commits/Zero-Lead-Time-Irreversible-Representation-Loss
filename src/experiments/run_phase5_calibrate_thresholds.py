@@ -29,6 +29,19 @@ K_HIGH = 3.0
 # run_phase5_metric_ordering.py earlier this session. Fixed the same
 # way, by using the real alpha matched generating process instead of an
 # unrelated full resample.
+#
+# Fixed a second, separate issue: the threshold formula used
+# mu + K*sd for both warning and high_risk. Since mu is negative here
+# (tail mass shrinks under contamination) and sd is positive, adding a
+# larger K moved the threshold toward zero, toward SAFE, not further
+# into the collapse tail. This made high_risk numerically less extreme
+# than warning, the opposite of what K_HIGH=3.0 > K_WARNING=1.0 was
+# meant to express. classify_risk's sorted-magnitude comparison masked
+# this by making the bands valid regardless of which one is larger, but
+# the calibration itself was computing the wrong pair of numbers. Fixed
+# by subtracting: mu - K*sd, so high_risk is now genuinely further into
+# the negative tail than warning, by construction, without relying on
+# classify_risk's sort to paper over it.
 ALPHA = 0.1
 
 
@@ -63,8 +76,8 @@ def main():
 
     thresholds = {
         "tail_mass_delta": {
-            "warning": mu + K_WARNING * sd,
-            "high_risk": mu + K_HIGH * sd,
+            "warning": mu - K_WARNING * sd,
+            "high_risk": mu - K_HIGH * sd,
         }
     }
 
