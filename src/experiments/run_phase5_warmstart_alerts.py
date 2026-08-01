@@ -38,7 +38,6 @@ from src.diagnostics.thresholds import classify_risk
 
 MODEL_TYPE = "unigram"
 ALPHA = 0.1                 # fixed contamination
-SAMPLE_SIZE = 20
 MAX_ITER = 15
 RANDOM_SEED = 42
 
