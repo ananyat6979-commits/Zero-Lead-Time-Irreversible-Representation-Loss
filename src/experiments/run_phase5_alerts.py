@@ -26,12 +26,8 @@ def main():
             "delta_tail_mass": delta,
             "risk_state": risk,
         })
-        
-        if d["iteration"] == 0:
-            risk = "SAFE"
-        else:
-            risk = classify_risk("tail_mass_delta", delta)
-        print(f"[D{d['iteration']}] Δtail={delta:.6f} → {risk}")
+
+        print(f"[D{d['iteration']}] delta_tail={delta:.6f} -> {risk}")
         
 
     OUT_PATH.write_text(json.dumps({
