@@ -62,10 +62,37 @@ def main():
 
         recovered_dist = empirical_distribution(recovered_tokens)
 
+        # ---- Matched-count pristine control ----
+        # recovered_model above trains on contaminated_tokens + original_tokens
+        # (retrain_from_contaminated=True), i.e. two effective passes worth of
+        # tokens. Per the same artifact already found and controlled for in
+        # run_phase4_warmstart.py and run_recovery_depth_sweep.py: training on
+        # more total tokens lowers JS-divergence via Laplace smoothing alone,
+        # independent of any real recovery from contamination. This control
+        # trains a fresh model on original_tokens twice, matching recovered_model's
+        # total token count, so the artifact is present in both and cancels
+        # out in the comparison below.
+        from src.experiments.model_factory import build_model
+
+        pristine_control = build_model(config.model_type, model_config={"min_token_count": 3})
+        pristine_control.train(original_tokens)
+        pristine_control.train(original_tokens)
+
+        control_tokens = pristine_control.sample(
+            sample_size=len(original_tokens),
+            rng=random.Random(config.random_seed),
+        )
+        control_dist = empirical_distribution(control_tokens)
+        js_control = js_divergence(original_dist, control_dist)
+
         results.append({
             "k": k,
             "js_recovered": js_divergence(original_dist, recovered_dist),
             "tail_mass_recovered": zipf_tail_mass(recovered_tokens),
+            "js_control_matched_count": js_control,
+            "js_recovered_minus_control": (
+                js_divergence(original_dist, recovered_dist) - js_control
+            ),
         })
 
     write_json(results, Path("results/recovery_threshold.json"))
