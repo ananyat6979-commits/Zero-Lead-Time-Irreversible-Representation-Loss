@@ -1,4 +1,4 @@
-# Phase 3.6 — Explicit Representational Bottleneck
+# Phase 3.6: Explicit Representational Bottleneck
 
 ## Motivation
 Phase 3.5 shows that self-training degradation is reversible
@@ -8,8 +8,24 @@ We now test whether irreversibility emerges only when the system
 explicitly destroys information.
 
 ## Bottleneck Definition
-A fixed vocabulary constraint is introduced after initial training.
-Tokens outside the frozen vocabulary are mapped to UNK.
+A frequency-based representational constraint is applied at every
+training call: any token whose count falls below `min_token_count`
+(here, 3) is dropped entirely from the model's distribution before
+sampling. This is implemented in `src/models/constraints.py`'s
+`apply_frequency_cutoff`, invoked via `model_config={"min_token_count": 3}`.
+
+Note this differs from an earlier draft of this plan, which described
+a fixed-vocabulary constraint (freeze the vocabulary from D0, map
+out-of-vocabulary tokens to UNK). That mechanism was never implemented
+for Phase 3.6; it exists separately as `src/data/bottlenecks.py`
+(`freeze_vocabulary` / `apply_vocab_bottleneck`), which is not called
+by this phase or any other. The two mechanisms are meaningfully
+different: a frequency cutoff re-evaluates the eligible token set at
+every iteration based on current corpus composition (dynamic), while a
+vocabulary freeze fixes the eligible set once at D0 and never revisits
+it (static). Phase 3.6's actual result reflects the dynamic,
+frequency-cutoff mechanism only. Testing the static vocabulary-freeze
+variant is a legitimate, separate follow-up experiment, not yet run.
 
 This constraint is:
 - Explicit
@@ -32,58 +48,13 @@ Recovered distribution remains statistically distinct from original
 after retraining.
 
 
-## Note (flagged, not resolved)
+## Resolution note (previously flagged, now resolved)
 
-Verified directly this session against the actual code: the implemented
-bottleneck mechanism does not match this document's description.
-
-This document describes a fixed vocabulary constraint with out of
-vocabulary tokens mapped to UNK. The actual implementation,
-src/models/constraints.py's apply_frequency_cutoff function, does
-something different: it drops any token with frequency below min_count
-entirely from the counter, with no UNK substitution and no fixed
-vocabulary defined in advance. It is a frequency based cutoff, not a
-vocabulary freeze with UNK mapping.
-
-Every usage seen throughout this session, run_phase3_6, run_phase5
-scripts, and elsewhere, invokes this via model_config equals
-min_token_count colon 3, confirming apply_frequency_cutoff is the actual,
-sole constraint mechanism in use, not a UNK based vocabulary freeze.
-
-Not resolved here. Worth reconciling whether this document describes an
-earlier planned design that was later implemented differently, or
-whether this is simply a drift between plan and implementation that was
-never noticed.
-
-## Note (confirmed, traced end to end)
-
-Follow-up to the note above. Traced the actual mechanism precisely this
-session: run_phase36.py and run_recovery_threshold.py pass
-model_config={"min_token_count": 3} into model construction.
-model_factory.py forwards this into the n-gram model's constructor.
-src/models/ngram.py stores it and calls apply_frequency_cutoff from
-src/models/constraints.py during training, permanently dropping any
-token below the threshold from the count table.
-
-Separately, src/data/bottlenecks.py exists and implements exactly what
-this document's main text describes: freeze_vocabulary builds a fixed
-vocabulary from D0, apply_vocab_bottleneck maps out-of-vocabulary tokens
-to <UNK>. Confirmed by a full-codebase search that neither function in
-this file is imported or called anywhere. This file is genuinely dead
-code, not a stale duplicate of the live mechanism, a fully unused,
-never-wired-in implementation of the originally planned design.
-
-So the drift is now precisely characterized: this document's main text
-describes bottlenecks.py's mechanism (vocabulary freeze plus UNK
-substitution), but every experiment that runs actually uses
-constraints.py's mechanism (frequency cutoff, permanent deletion, no
-UNK token). These are meaningfully different: frequency cutoff removes
-rare tokens from the model's representation entirely at every
-retraining, while vocabulary freeze plus UNK would preserve rare tokens
-as a collapsed shared signal rather than deleting them outright.
-
-Not resolved here. The remaining decision is editorial, not diagnostic:
-either delete src/data/bottlenecks.py since it is unused, or keep it
-and label it clearly as an unused alternate design rather than
-implying, by its presence and naming, that it is part of the working
-pipeline.
+An earlier version of this document described a fixed-vocabulary/UNK
+mechanism that didn't match the actual implementation. The Bottleneck
+Definition section above has been corrected to describe the real
+mechanism (frequency cutoff via `apply_frequency_cutoff`). The unused
+`src/data/bottlenecks.py` file, which implemented the originally
+planned but never-adopted vocabulary-freeze mechanism, has been removed
+from the active codebase: see project history for the original
+implementation if the static-vocabulary variant is revisited later.
