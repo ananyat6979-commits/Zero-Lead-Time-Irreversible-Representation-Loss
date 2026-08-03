@@ -70,7 +70,7 @@ def main():
     Path("results").mkdir(exist_ok=True)
     with open("results/phase5_thresholds_js_based.json", "w") as f:
         json.dump(thresholds, f, indent=2)
-    with open("results/phase5_alerts.json", "w") as f:
+    with open("results/phase5_alerts_js_based.json", "w") as f:
         json.dump(alerts, f, indent=2)
 
 if __name__ == "__main__":
