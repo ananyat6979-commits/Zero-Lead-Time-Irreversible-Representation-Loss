@@ -54,3 +54,36 @@ Not resolved here. Worth reconciling whether this document describes an
 earlier planned design that was later implemented differently, or
 whether this is simply a drift between plan and implementation that was
 never noticed.
+
+## Note (confirmed, traced end to end)
+
+Follow-up to the note above. Traced the actual mechanism precisely this
+session: run_phase36.py and run_recovery_threshold.py pass
+model_config={"min_token_count": 3} into model construction.
+model_factory.py forwards this into the n-gram model's constructor.
+src/models/ngram.py stores it and calls apply_frequency_cutoff from
+src/models/constraints.py during training, permanently dropping any
+token below the threshold from the count table.
+
+Separately, src/data/bottlenecks.py exists and implements exactly what
+this document's main text describes: freeze_vocabulary builds a fixed
+vocabulary from D0, apply_vocab_bottleneck maps out-of-vocabulary tokens
+to <UNK>. Confirmed by a full-codebase search that neither function in
+this file is imported or called anywhere. This file is genuinely dead
+code, not a stale duplicate of the live mechanism, a fully unused,
+never-wired-in implementation of the originally planned design.
+
+So the drift is now precisely characterized: this document's main text
+describes bottlenecks.py's mechanism (vocabulary freeze plus UNK
+substitution), but every experiment that runs actually uses
+constraints.py's mechanism (frequency cutoff, permanent deletion, no
+UNK token). These are meaningfully different: frequency cutoff removes
+rare tokens from the model's representation entirely at every
+retraining, while vocabulary freeze plus UNK would preserve rare tokens
+as a collapsed shared signal rather than deleting them outright.
+
+Not resolved here. The remaining decision is editorial, not diagnostic:
+either delete src/data/bottlenecks.py since it is unused, or keep it
+and label it clearly as an unused alternate design rather than
+implying, by its presence and naming, that it is part of the working
+pipeline.
